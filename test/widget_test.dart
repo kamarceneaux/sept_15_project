@@ -64,4 +64,54 @@ void main() {
 
     expect(await _display(tester), 'Error');
   });
+
+  testWidgets('Chained operations: 2 + 3 then x 4 = 20', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.byKey(const Key('digit_2')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('op_add')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('digit_3')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('op_mul')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('digit_4')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('equals')));
+    await tester.pump();
+
+    expect(await _display(tester), '20');
+  });
+
+  testWidgets('Backspace removes the last digit', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.byKey(const Key('digit_1')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('digit_2')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('digit_3')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('backspace')));
+    await tester.pump();
+
+    expect(await _display(tester), '12');
+  });
+
+  testWidgets('Plus/minus toggles the sign', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.byKey(const Key('digit_9')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('plusMinus')));
+    await tester.pump();
+
+    expect(await _display(tester), '-9');
+
+    await tester.tap(find.byKey(const Key('plusMinus')));
+    await tester.pump();
+
+    expect(await _display(tester), '9');
+  });
 }
