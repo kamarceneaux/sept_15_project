@@ -1,56 +1,67 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:sept_15_project/main.dart';
 
+Future<String> _display(WidgetTester tester) async {
+  return tester.widget<Text>(find.byKey(const Key('display'))).data!;
+}
+
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('Calculator starts at 0', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.byKey(const Key('counterText')), findsOneWidget);
-    expect(find.text('0'), findsNWidgets(2)); // counter display + reset button
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(
-      tester.widget<Text>(find.byKey(const Key('counterText'))).data,
-      '1',
-    );
+    expect(await _display(tester), '0');
   });
 
-  testWidgets('Counter decrements three times when "-" is pressed',
-      (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('Basic addition: 5 + 3 = 8', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
 
-    // Verify that our counter starts at 0.
-    expect(
-      tester.widget<Text>(find.byKey(const Key('counterText'))).data,
-      '0',
-    );
+    await tester.tap(find.byKey(const Key('digit_5')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('op_add')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('digit_3')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('equals')));
+    await tester.pump();
 
-    // Tap the '-' icon three times, triggering a frame after each tap.
-    for (var i = 0; i < 3; i++) {
-      await tester.tap(find.byIcon(Icons.remove));
-      await tester.pump();
-    }
+    expect(await _display(tester), '8');
+  });
 
-    // Verify that the counter decremented by 3.
-    expect(
-      tester.widget<Text>(find.byKey(const Key('counterText'))).data,
-      '-3',
-    );
+  testWidgets('Clear resets the display', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.byKey(const Key('digit_7')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('clear')));
+    await tester.pump();
+
+    expect(await _display(tester), '0');
+  });
+
+  testWidgets('Square root of 9 is 3', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.byKey(const Key('digit_9')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('fn_sqrt')));
+    await tester.pump();
+
+    expect(await _display(tester), '3');
+  });
+
+  testWidgets('Division by zero shows Error', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.byKey(const Key('digit_5')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('op_div')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('digit_0')));
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('equals')));
+    await tester.pump();
+
+    expect(await _display(tester), 'Error');
   });
 }
